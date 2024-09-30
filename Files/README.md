@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project demonstrates how to create a Generative AI pipeline using [Pathway](https://pathway.com) and OpenAI. The application can ingest and process data from multiple sources, such as a local filesystem, Google Drive, or SharePoint, and respond to user queries through a Retrieval-Augmented Generation (RAG) system. The pipeline leverages Pathway’s connectors to continuously track data changes, processes unstructured data, and indexes them using embeddings from OpenAI’s models.
+This project demonstrates how to create a Generative AI pipeline using Pathway and OpenAI. The application can ingest and process data from multiple sources, such as a local filesystem, Google Drive, or SharePoint, and respond to user queries through a Retrieval-Augmented Generation (RAG) system. The pipeline leverages Pathway’s connectors to continuously track data changes, processes unstructured data, and indexes them using embeddings from OpenAI’s models.
 
 ### Demo Video
 
@@ -82,89 +82,21 @@ chat = llms.OpenAIChat(api_key='sk-...', ...)
 embedder = embedders.OpenAIEmbedder(api_key='sk-...', ...)
 ```
 
-### Data sources
-
-You can configure the data sources in the `config.source` part of the `conf.yaml`.
-You can add as many data sources as you want, but the demo supports only three kinds: `local`, `gdrive`, and `sharepoint`. You can have several sources of the same kind, for instance, several local sources from different folders.
-The sections below describe the essential parameters that need to be specified for each of those sources.
-
-By default, the app uses a local data source to read documents from the `data` folder.
-
-You can use other kind of data sources using the different [connectors](https://pathway.com/developers/user-guide/connecting-to-data/connectors) provided by Pathway.
-To do so, you need to add them in `data_sources` in `app.py`
-
-
-#### Local Data Source
-
-The local data source is configured by setting the `kind` parameter to `local`.
-
-The section `config` must contain the string parameter `path` denoting the path to a folder with files to be indexed.
-
-#### Google Drive Data Source
-
-The Google Drive data source is enabled by setting the `kind` parameter to `gdrive`.
-
-The section `config` must contain two main parameters:
-- `object_id`, containing the ID of the folder that needs to be indexed. It can be found from the URL in the web interface, where it's the last part of the address. For example, the publicly available demo folder in Google Drive has the URL `https://drive.google.com/drive/folders/1cULDv2OaViJBmOfG5WB0oWcgayNrGtVs`. Consequently, the last part of this address is `1cULDv2OaViJBmOfG5WB0oWcgayNrGtVs`, hence this is the `object_id` you would need to specify.
-- `service_user_credentials_file`, containing the path to the credentials files for the Google [service account](https://cloud.google.com/iam/docs/service-account-overview). To get more details on setting up the service account and getting credentials, you can also refer to [this tutorial](https://pathway.com/developers/user-guide/connectors/gdrive-connector/#setting-up-google-drive).
-
-Besides, to speed up the indexing process you may want to specify the `refresh_interval` parameter, denoted by an integer number of seconds. It corresponds to the frequency between two sequential folder scans. If unset, it defaults to 30 seconds.
-
-For the full list of the available parameters, please refer to the Google Drive connector [documentation](https://pathway.com/developers/api-docs/pathway-io/gdrive#pathway.io.gdrive.read).
-
-#### Using the Provided Demo Folder
-
-We provide a publicly available folder in Google Drive for demo purposes; you can access it [here](https://drive.google.com/drive/folders/1cULDv2OaViJBmOfG5WB0oWcgayNrGtVs).
-
-A default configuration for the Google Drive source in `config.yaml` is available and connects to the folder: uncomment the corresponding part and replace `SERVICE_CREDENTIALS` with the path to the credentials file.
-
-Once connected, you can upload files to the folder, which will be indexed by Pathway.
-Note that this folder is publicly available, and you cannot remove anything: **please be careful not to upload files containing any sensitive information**.
-
-#### Using a Custom Folder
-
-If you want to test the indexing pipeline with the data you wouldn't like to share with others, it's possible: with your service account, you won't have to share the folders you've created in your private Google Drive.
-
-Therefore, all you would need to do is the following:
-- Create a service account and download the credentials that will be used;
-- For running the demo, create your folder in Google Drive and don't share it.
-
-#### SharePoint Data Source
-
-This data source is the part of commercial Pathway offering. You can try it online in one of the following demos:
-- The real-time document indexing pipeline with similarity search, available on the [Hosted Pipelines](https://pathway.com/solutions/ai-pipelines) webpage;
-- The chatbot answering questions about the uploaded files, available on [Streamlit](https://chat-realtime-sharepoint-gdrive.demo.pathway.com/).
-
 ## How to run the project
-
-### Locally
-If you are on Windows, please refer to [running with docker](#With-Docker) section below.
-
-To run locally, change your directory in the terminal to this folder. Then, run the app with `python`.
-
-```bash
-cd examples/pipelines/demo-question-answering
-
-python app.py
-```
-
-Please note that the local run requires the dependencies to be installed. It can be done with a simple pip command:
-`pip install -r requirements.txt`
 
 ### With Docker
 
 In order to let the pipeline get updated with each change in local files, you need to mount the folder onto the docker. The following commands show how to do that.
 
-You can omit the ```-v `pwd`/data:/app/data``` part if you are not using local files as a source. 
 ```bash
 # Make sure you are in the right directory.
-cd examples/pipelines/demo-question-answering
+cd yourDirectory #where files are there
 
 # Build the image in this folder
 docker build -t qa .
 
 # Run the image, mount the `data` folder into image and expose the port `8000`
-docker run -v `pwd`/data:/app/data -p 8000:8000 qa
+docker run -v `%cd%`/data:/app/data -p 8000:8000 qa
 ```
 
 ### Query the documents
