@@ -123,8 +123,6 @@ Invoke-RestMethod -Method POST `
 
 
 
-#### Adding Files to Index
+#### Note:
 
-First, you can try adding your files and seeing changes in the index. To test index updates, simply add more files to the `data` folder.
-
-If you are using Google Drive or other sources, simply upload your files there.
+More files can be added to the `data` folder or (Google Drive) simply upload your files there.
