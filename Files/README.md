@@ -23,16 +23,18 @@ Ensure that Docker is installed on your system. You can verify by running the fo
 
 ```bash
 docker --version
+```
+## Folder Structure
 
-## Pipeline Organization
+This folder contains the following components:
 
-This folder contains several objects:
-- `app.py`, the application code using Pathway and written in Python;
-- `config.yaml`, the file containing configuration stubs for the data sources, the OpenAI LLM model, and the web server. It needs to be customized if you want to change the LLM model, use the Google Drive data source or change the filesystem directories that will be indexed;
-- `requirements.txt`, the dependencies for the pipeline. It can be passed to `pip install -r ...` to install everything that is needed to launch the pipeline locally;
-- `Dockerfile`, the Docker configuration for running the pipeline in the container;
-- `.env`, a short environment variables configuration file where the OpenAI key must be stored;
-- `data/`, a folder with exemplary files that can be used for the test runs.
+- **`app.py`**: The core application code, written in Python, which leverages Pathway.
+- **`app.yaml`**: Configuration file for data sources, the OpenAI LLM model, and the web server. Customize this file to modify the LLM model, switch to a Google Drive data source, or adjust the filesystem directories for indexing.
+- **`requirements.txt`**: Lists the pipeline dependencies. Use `pip install -r requirements.txt` to install all necessary packages for running the pipeline locally.
+- **`Dockerfile`**: Configuration file for Docker, enabling the pipeline to run inside a container.
+- **`.env`**: A simple configuration file where the OpenAI API key should be stored as an environment variable.
+- **`data/`**: A folder containing sample files for testing the pipeline.
+- 
 
 ## Pathway tooling
 - Prompts and helpers
