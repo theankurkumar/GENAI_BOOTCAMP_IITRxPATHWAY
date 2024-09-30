@@ -1,54 +1,28 @@
-# Pathway RAG app with always up-to-date knowledge
+# Generative AI with OpenAI
 
-This demo shows how to create a RAG application using [Pathway](https://github.com/pathwaycom/pathway) that provides always up-to-date knowledge to your LLM without the need for a separate ETL. 
+This repository contains a Generative AI project that utilizes OpenAI's API to build a Question-Answering system (RAG - Retrieval-Augmented Generation) using Docker, Pathway, and OpenAI. The project showcases how to set up and run an advanced QA pipeline using LLMs (Large Language Models).
 
-You can have a preview of the demo [here](https://pathway.com/solutions/ai-pipelines).
+## Project Overview
 
-You will see a running example of how to get started with the Pathway vector store that eliminates the need for ETL pipelines which are needed in the regular VectorDBs. 
-This significantly reduces the developer's workload.
+The project leverages Docker for containerization, Pathway for data processing, and OpenAI's GPT models for generating answers based on document inputs. The steps below guide you through setting up the project, configuring it, and running the application locally in a Docker environment.
 
-This demo allows you to:
+## How It Works
 
-- Create a vector store with real-time document indexing from Google Drive, Microsoft 365 SharePoint, or a local directory;
-- Connect an OpenAI LLM model of choice to your knowledge base;
-- Get quality, accurate, and precise responses to your questions;
-- Ask questions about folders, files or all your documents easily, with the help of filtering options;
-- Use LLMs over API to summarize texts;
-- Get an executive outlook for a question on different files to easily access available knowledge in your documents;
+This pipeline uses several Pathway connectors to read data from local drives, Google Drive, and Microsoft SharePoint sources. It tracks modifications with low latency, ensuring that any changes in the tracked files are reflected in the internal collections. 
 
+### Key Steps:
+1. **Data Ingestion**: Pathway connectors read files from various sources such as the local drive, Google Drive, and SharePoint. These files are read into a single Pathway Table as binary objects.
+2. **Content Parsing**: The binary objects are parsed using the `unstructured` library, and then the parsed content is split into smaller, manageable chunks.
+3. **Embeddings Generation**: The chunks are passed to OpenAI's API to generate embeddings, which are vector representations of the text.
+4. **Indexing**: The embeddings are indexed using Pathway's machine-learning library, making the data searchable and enabling fast query responses.
+5. **Querying**: Users can make simple HTTP requests to the defined endpoints to retrieve information from the indexed data. The system supports querying using RESTful API endpoints.
 
-Note: This app relies on [Pathway Vector store](https://pathway.com/developers/api-docs/pathway-xpacks-llm/vectorstore) to learn more, you can check out [this blog post](https://pathway.com/developers/user-guide/llm-xpack/vectorstore_pipeline/).
+## Prerequisites
 
-# Table of content
-- [Summary of available endpoints](#Summary-of-available-endpoints)
-- [How it works](#How-it-works)
-- [Configuring the app](#Configuration)
-- [How to run the project](#How-to-run-the-project)
-- [Using the app](#Query-the-documents)
+Ensure that Docker is installed on your system. You can verify by running the following command in your terminal:
 
-
-## Summary of available endpoints
-
-This example spawns a lightweight webserver that accepts queries on six possible endpoints, divided into two categories: document indexing and RAG with LLM.
-
-### Document Indexing capabilities
-- `/v1/retrieve` to perform similarity search;
-- `/v1/statistics` to get the basic stats about the indexer's health;
-- `/v1/pw_list_documents` to retrieve the metadata of all files currently processed by the indexer.
-
-### LLM and RAG capabilities
-- `/v1/pw_ai_answer` to ask questions about your documents, or directly talk with your LLM;
-- `/v1/pw_ai_summary` to summarize a list of texts;
-
-See the [using the app section](###Using-the-app) to learn how to use the provided endpoints.
-
-## How it works
-
-This pipeline uses several Pathway connectors to read the data from the local drive, Google Drive, and Microsoft SharePoint sources. It allows you to poll the changes with low latency and to do the modifications tracking. So, if something changes in the tracked files, the corresponding change is reflected in the internal collections. The contents are read into a single Pathway Table as binary objects. 
-
-After that, those binary objects are parsed with [unstructured](https://unstructured.io/) library and split into chunks. With the usage of OpenAI API, the pipeline embeds the obtained chunks.
-
-Finally, the embeddings are indexed with the capabilities of Pathway's machine-learning library. The user can then query the created index with simple HTTP requests to the endpoints mentioned above.
+```bash
+docker --version
 
 ## Pipeline Organization
 
