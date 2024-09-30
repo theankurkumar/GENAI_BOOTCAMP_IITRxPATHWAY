@@ -6,7 +6,7 @@ This project demonstrates how to create a Generative AI pipeline using Pathway a
 
 ### Demo Video
 
-[![Demo Video](https://link_to_demo_gif_or_thumbnail_image)](https://link_to_demo_video)  
+[![Demo Video](https://link_to_demo_gif_or_thumbnail_image)]([https://link_to_demo_video](https://drive.google.com/file/d/17A41z-RW65vW2UCvN71TXD3Hs0ZzE-Rs/view?usp=drive_link))  
 *Click the image above to watch the demo video.*
 
 ## Purpose
