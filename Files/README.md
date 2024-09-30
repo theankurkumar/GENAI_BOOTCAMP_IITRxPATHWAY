@@ -56,15 +56,6 @@ This folder contains the following components:
 - OpenAI API key (for generating embeddings and language model inference).
 - Python installed locally (for installing dependencies).
 
-### Step 1: Verify Docker Installation
-
-Ensure Docker is installed by running the following command:
-
-```bash
-docker --version
-```
-
-
 
 ## OpenAI API Key Configuration
 
@@ -84,7 +75,13 @@ embedder = embedders.OpenAIEmbedder(api_key='sk-...', ...)
 
 ## How to run the project
 
-### With Docker
+### Verify Docker Installation
+
+Ensure Docker is installed by running the following command:
+
+```bash
+docker --version
+```
 
 In order to let the pipeline get updated with each change in local files, you need to mount the folder onto the docker. The following commands show how to do that.
 
@@ -93,126 +90,37 @@ In order to let the pipeline get updated with each change in local files, you ne
 cd yourDirectory #where files are there
 
 # Build the image in this folder
-docker build -t qa .
+docker build -t rag .
 
 # Run the image, mount the `data` folder into image and expose the port `8000`
 docker run -v `%cd%`/data:/app/data -p 8000:8000 qa
 ```
 
-### Query the documents
+### Query the application
 You will see the logs for parsing & embedding documents in the Docker image logs. 
 Give it a few minutes to finish up on embeddings, you will see `0 entries (x minibatch(es)) have been...` message.
 If there are no more updates, this means the app is ready for use!
 
 To test it, let's query the stats:
 ```bash
-curl -X 'POST'   'http://localhost:8000/v1/statistics'   -H 'accept: */*'   -H 'Content-Type: application/json'
+Invoke-WebRequest -Uri 'http://localhost:8000/v1/pw_list_documents' `
+                  -Method POST `
+                  -Headers @{ "accept"="/"; "Content-Type"="application/json" } `
+                  -Body '{}'
 ```
 
-For more information on available endpoints by default, see [API docs](https://pathway.com/solutions/ai-pipelines).
 
-We provide some example `curl` queries to start with.
-
-The general structure is sending a request to `http://{HOST}:{PORT}/{ENDPOINT}`.
-
-Where HOST is the `host` variable you specify in your app configuration. PORT is the `port` number you are running your app on, and ENDPOINT is the specific extension for endpoints. They are specified in the application code, and they are listed with the versioning as `/v1/...`.
-
-Note that, if you are using the Pathway hosted version, you should send requests to `https://...` rather than `http://...` and emit the `:{PORT}` part of the URL.
-
-You need to add two headers, `-H 'accept: */*'   -H 'Content-Type: application/json'`.
-
-Finally, for endpoints that expect data in the query, you can pass it with `-d '{key: value}'` format.
-
-#### Listing inputs
-Get the list of available inputs and associated metadata.
+#### Asking questions to LLM
 
 ```bash
-curl -X 'POST'   'http://localhost:8000/v1/pw_list_documents'   -H 'accept: */*'   -H 'Content-Type: application/json'
+Invoke-RestMethod -Method POST `
+  -Uri 'http://localhost:8000/v1/pw_ai_answer' `
+  -Headers @{ "accept"="/"; "Content-Type"="application/json" } `
+  -Body '{"prompt": "What is the author name?"}'
 ```
+#### Following is the Output of my prompt given to LLM app
+![Prompt](https://github.com/user-attachments/assets/7b8d8ca6-0135-4d2b-91c4-f78b0ca6a0d9)
 
-#### Searching in your documents
-
-Search API gives you the ability to search in available inputs and get up-to-date knowledge.
-`query` is the search query you want to execute.
-
-`k` (optional) is an integer, the number of documents to be retrieved. Documents in this case means small chunks that are stored in your vector store.
-
-`metadata_filter` (optional) String to filter results with Jmespath query.
-
-`filepath_globpattern` (optional) String to filter results with globbing pattern. For example `"*"` would result in no filter, `"*.docx"` would result in only `docx` files being retrieved.
-
-
-```bash
-curl -X 'POST' \
-  'http://0.0.0.0:8000/v1/retrieve' \
-  -H 'accept: */*' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "query": "What is the start date of the contract?",
-  "k": 2
-}'
-```
-
-#### Asking questions to LLM (With and without RAG)
-
-- Note: The local version of this app does not require `openai_api_key` parameter in the payload of the query. Embedder and LLM will use the API key in the `.env` file. However, Pathway hosted public demo available on the website [website](https://pathway.com/solutions/ai-pipelines/) requires a valid `openai_api_key` to execute the query.
-
-- Note: All of the RAG endpoints use the `model` provided in the config by default, however, you can specify another model with the `model` parameter in the payload to use a different one for generating the response.
-
-For question answering without any context, simply omit `filters` key in the payload and send the following request.
-
-```bash
-curl -X 'POST' \
-  'http://0.0.0.0:8000/v1/pw_ai_answer' \
-  -H 'accept: */*' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "prompt": "What is the start date of the contract?"
-}'
-```
-
-Question answering with the knowledge from files that have the word `Ide` in their paths.
-```bash
-curl -X 'POST' \
-  'http://0.0.0.0:8000/v1/pw_ai_answer' \
-  -H 'accept: */*' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "prompt": "What is the start date of the contract?",
-  "filters": "contains(path, `Ide`)"
-}'
-```
-
-- Note: You can limit the knowledge to a folder or, to only Word documents by using ```"contains(path, `docx`)"```
-- Note: You could also use a few filters separated with `||` (`or` clause) or with `&&` (`and` clause).
-
-You can further modify behavior in the payload by defining keys and values in `-d '{key: value}'`.
-
-If you wish to use another model, specify in the payload as `"model": "gpt-4"`.
-
-For more detailed responses add `"response_type": "long"` to payload.
-
-#### Summarization
-To summarize a list of texts, use the following `curl` command.
-
-```bash
-curl -X 'POST' \
-  'http://0.0.0.0:8000/v1/pw_ai_summary' \
-  -H 'accept: */*' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "text_list": [
-    "I love apples.",
-    "I love oranges."
-  ]
-}'
-```
-
-Specifying the GPT model with `"model": "gpt-4"` is also possible.
-
-This endpoint also supports setting different models in the query by default.
-
-To execute similar curl queries as above, you can visit [ai-pipelines page](https://pathway.com/solutions/ai-pipelines/) and try out the queries from the Swagger UI.
 
 
 #### Adding Files to Index
