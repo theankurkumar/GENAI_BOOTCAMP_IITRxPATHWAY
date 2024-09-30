@@ -97,7 +97,7 @@ docker run -v `%cd%`/data:/app/data -p 8000:8000 qa
 ```
 
 ### Query the application
-You will see the logs for parsing & embedding documents in the Docker image logs. 
+You will see the logs for parsing & embedding documents in the Docker image logs. (attach below)
 Give it a few minutes to finish up on embeddings, you will see `0 entries (x minibatch(es)) have been...` message.
 If there are no more updates, this means the app is ready for use!
 
@@ -108,9 +108,10 @@ Invoke-WebRequest -Uri 'http://localhost:8000/v1/pw_list_documents' `
                   -Headers @{ "accept"="/"; "Content-Type"="application/json" } `
                   -Body '{}'
 ```
+![Docker logs](https://github.com/user-attachments/assets/ba8adb18-3b0a-4dc2-8539-c591b7b13ab5)
 
 
-#### Asking questions to LLM
+### Asking questions to LLM
 
 ```bash
 Invoke-RestMethod -Method POST `
