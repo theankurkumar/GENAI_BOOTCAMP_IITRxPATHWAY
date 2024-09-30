@@ -1,29 +1,34 @@
-# Generative AI with OpenAI
+# Generative AI Pipeline with Pathway and OpenAI
 
-This repository contains a Generative AI project that utilizes OpenAI's API to build a Question-Answering system (RAG - Retrieval-Augmented Generation) using Docker, Pathway, and OpenAI. The project showcases how to set up and run an advanced QA pipeline using LLMs (Large Language Models).
+## Overview
 
-## Project Overview
+This project demonstrates how to create a Generative AI pipeline using [Pathway](https://pathway.com) and OpenAI. The application can ingest and process data from multiple sources, such as a local filesystem, Google Drive, or SharePoint, and respond to user queries through a Retrieval-Augmented Generation (RAG) system. The pipeline leverages Pathway’s connectors to continuously track data changes, processes unstructured data, and indexes them using embeddings from OpenAI’s models.
 
-The project leverages Docker for containerization, Pathway for data processing, and OpenAI's GPT models for generating answers based on document inputs. The steps below guide you through setting up the project, configuring it, and running the application locally in a Docker environment.
+### Demo Video
 
-## How It Works
+[![Demo Video](https://link_to_demo_gif_or_thumbnail_image)](https://link_to_demo_video)  
+*Click the image above to watch the demo video.*
 
-This pipeline uses several Pathway connectors to read data from local drives, Google Drive, and Microsoft SharePoint sources. It tracks modifications with low latency, ensuring that any changes in the tracked files are reflected in the internal collections. 
+## Purpose
 
-### Key Steps:
-1. **Data Ingestion**: Pathway connectors read files from various sources such as the local drive, Google Drive, and SharePoint. These files are read into a single Pathway Table as binary objects.
-2. **Content Parsing**: The binary objects are parsed using the `unstructured` library, and then the parsed content is split into smaller, manageable chunks.
-3. **Embeddings Generation**: The chunks are passed to OpenAI's API to generate embeddings, which are vector representations of the text.
-4. **Indexing**: The embeddings are indexed using Pathway's machine-learning library, making the data searchable and enabling fast query responses.
-5. **Querying**: Users can make simple HTTP requests to the defined endpoints to retrieve information from the indexed data. The system supports querying using RESTful API endpoints.
+The goal of this project is to create a scalable question-answering system using the capabilities of Pathway, along with models from OpenAI for embedding and language understanding. The application retrieves data from various sources, processes the content into structured formats, and makes it queryable by users through an HTTP API.
 
-## Prerequisites
+This project demonstrates:
+- **Pathway** for real-time data processing and change tracking.
+- **Langchain** for chaining multiple LLM-powered operations (optional).
+- **LlamaIndex** to manage large-scale data retrieval (optional).
+- **Ollama** for model inference (optional).
+- **OpenAI** for embeddings and language model inference.
 
-Ensure that Docker is installed on your system. You can verify by running the following command in your terminal:
+The project highlights the use of these technologies for efficient data management and intelligent query handling.
 
-```bash
-docker --version
-```
+## Features
+
+- Ingest and index data from multiple sources (local, Google Drive, SharePoint).
+- Query large datasets using OpenAI embeddings for Retrieval-Augmented Generation (RAG).
+- Continuous real-time monitoring of data changes with low-latency processing.
+- HTTP API for querying the system, returning intelligent answers from indexed content.
+
 ## Folder Structure
 
 This folder contains the following components:
@@ -34,23 +39,31 @@ This folder contains the following components:
 - **`Dockerfile`**: Configuration file for Docker, enabling the pipeline to run inside a container.
 - **`.env`**: A simple configuration file where the OpenAI API key should be stored as an environment variable.
 - **`data/`**: A folder containing sample files for testing the pipeline.
-- 
 
-## Pathway tooling
-- Prompts and helpers
+### Key Steps:
+1. **Data Ingestion**: Pathway connectors read files from various sources such as the local drive, Google Drive, and SharePoint. These files are read into a single Pathway Table as binary objects.
+2. **Content Parsing**: The binary objects are parsed using the `unstructured` library, and then the parsed content is split into smaller, manageable chunks.
+3. **Embeddings Generation**: The chunks are passed to OpenAI's API to generate embeddings, which are vector representations of the text.
+4. **Indexing**: The embeddings are indexed using Pathway's machine-learning library, making the data searchable and enabling fast query responses.
+5. **Querying**: Users can make simple HTTP requests to the defined endpoints to retrieve information from the indexed data. The system supports querying using RESTful API endpoints.
 
-Pathway allows you to define custom prompts in addition to the ones provided in [`pathway.xpacks.llm`](https://pathway.com/developers/user-guide/llm-xpack/overview).
 
-You can also use user-defined functions using the [`@pw.udf`](https://pathway.com/developers/api-docs/pathway/#pathway.udf) decorator to define custom functions that will run on streaming data.
+## Setup Instructions
 
-- RAG
+### Prerequisites
 
-Pathway provides all the tools to create a RAG application and query it: a [Pathway vector store](https://pathway.com/developers/api-docs/pathway-xpacks-llm/splitters) and a web server (defined with the [REST connector](https://pathway.com/developers/api-docs/pathway-io/http#pathway.io.http.rest_connector)).
-They are defined in our demo in the main class `PathwayRAG` along with the different functions and schemas used by the RAG.
+- Docker installed on your system.
+- OpenAI API key (for generating embeddings and language model inference).
+- Python installed locally (for installing dependencies).
 
-For the sake of the demo, we kept the app simple, consisting of the main components you would find in a regular RAG application. It can be further enhanced with query writing methods, re-ranking layer and custom splitting steps.
+### Step 1: Verify Docker Installation
 
-Don't hesitate to take a look at our [documentation](https://pathway.com/developers/user-guide/introduction/welcome) to learn how Pathway works.
+Ensure Docker is installed by running the following command:
+
+```bash
+docker --version
+```
+
 
 
 ## OpenAI API Key Configuration
@@ -67,51 +80,6 @@ You can also set the key in the `app.py` while initializing the embedder and cha
 chat = llms.OpenAIChat(api_key='sk-...', ...)
 
 embedder = embedders.OpenAIEmbedder(api_key='sk-...', ...)
-```
-
-If you want to use another model, you should put the associated key here.
-
-## Configuration
-
-By modifying the `conf.yaml` file, you can configure the following options:
-- the Open AI LLM model
-- the webserver
-- the cache options
-- the data sources
-
-### Model
-
-You can choose any of the GPT-3.5 Turbo, GPT-4, or GPT-4 Turbo models proposed by Open AI.
-You can find the whole list on their [models page](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo).
-
-You simply need to change the model to the one you want to use:
-```yaml
-llm_config:
-  model: "gpt-4-0613"
-```
-
-The default model is `gpt-3.5-turbo`
-
-Note that if you want to use different models, such as the ones provided by HuggingFace, you will need to change the `run` function in `app.py`. You can use [Pathway LLM xpack](https://pathway.com/developers/user-guide/llm-xpack/overview) to access the model of your choice. Don't forget to update your key.
-
-### Webserver
-
-You can configure the host and the port of the webserver.
-Here is the default configuration:
-```yaml
-host_config:
-  host: "0.0.0.0"
-  port: 8000
-```
-
-### Cache
-
-You can configure whether you want to enable cache, to avoid repeated API accesses, and where the cache is stored.
-Default values:
-```yaml
-cache_options:
-  with_cache: True
-  cache_folder: "./Cache"
 ```
 
 ### Data sources
