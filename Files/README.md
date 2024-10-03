@@ -94,7 +94,7 @@ cd yourDirectory #where files are there
 docker build -t rag .
 
 # Run the image, mount the `data` folder into image and expose the port `8000`
-docker run -v `%cd%`/data:/app/data -p 8000:8000 qa
+docker run -v "${PWD}/data:/app/data" -p 8000:8000 rag
 ```
 
 ### Query the application
